@@ -9,7 +9,7 @@ static int d = 0;
 void destroy();
 
 void init(int *a, int da) {
-	if (e == NULL) {
+	if (e != NULL) {
 		destroy();
 	}
 

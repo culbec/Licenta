@@ -1,0 +1,8 @@
+# compiled sources
+*.exe
+*.dll
+*.so
+*.o
+
+# configs
+.vscode
