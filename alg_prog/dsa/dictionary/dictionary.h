@@ -1,27 +1,15 @@
-// Dictionaries are containers that encapsulate key:value pairs, meant for easy retrieval
-// based on the key. The keys are unique, and the most popular types of dictionaries
-// are those which have a single value associated per key.
+// Dictionaries are ADT which are used to store key-value pairs.
+// The uniqueness of the keys allows for efficient retrieval of values
+// based on the key, making dictionaries a powerful data structure for many applications.
 
-// For easy retrieval, hash functions are used. Hash functions are mathematical functions
-// which provide a deterministic and (so) unique value for a provided argument. That said,
-// collisions can appear, which are situations when two arguments resolve to the same value,
-// and they are solved as follows:
-//  * Separate Chaining: all values that resolve to the same index in the dictionary are stored in a list,
-//  *                    where they can be found easily by traversing the internal list.
-//  * Open Addressing: collisions are solved internally, by applying one of the following techniques:
-//  *   1. Linear probing: if the hash position is occupied, then we search for the next linearly until we find one;
-//  *                      if no position is found, then we might need to start rehashing;
-//  *   2. Quadratic proving: linear hashing, but on an arbitrary quadratic polynomial:
-//  *           hash + 1^2, hash + 2^2, ..., hash + k^2
-//  *       this method leaves gaps between equal hashes and thus is easier to find a place
-//  *   3. Double hashing: the element is hashed twice, using two different hashing functions,
-//  *                       if a collision appears with the first
+// Dictionaries are mostly implemented using hash tables.
 
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
 
 #include <iostream>
 #include <exception>
+#include "../hash_table/hash_table.h"
 
 typedef int TElem;
 typedef TElem TKey;
@@ -33,28 +21,6 @@ typedef TElem TValue;
 class Dictionary;
 class DictionaryIterator;
 
-class KeyValuePair
-{
-    friend class Dictionary;
-    friend class DictionaryIterator;
-
-private:
-    TKey key;
-    TValue value;
-
-public:
-    KeyValuePair() : key{NULL_KEY}, value{NULL_VALUE} {}
-    KeyValuePair(TKey k, TValue v) : key{k}, value{v} {}
-
-    inline TKey getKey() { return this->key; }
-    inline TValue getValue() { return this->value; }
-
-    friend std::ostream& operator<<(std::ostream& os, KeyValuePair kvp) {
-        os << "{" << kvp.getKey() << ":" << kvp.getValue() << "}";
-        return os;
-    }
-};
-
 #define DICTIONARY_INITIAL_CAPACITY 10
 #define DICTIONARY_GROWTH_FACTOR 2
 
@@ -63,16 +29,7 @@ class Dictionary
     friend class DictionaryIterator;
 
 private:
-    size_t capacity;
-    size_t size;
-    KeyValuePair *elements;
-
-    // Double hashing collision resolution
-
-    inline size_t hash1(TKey k);
-    inline size_t hash2(TKey k);
-
-    void resize();
+    HashTable hash_table;
 
 public:
     Dictionary(size_t c = DICTIONARY_INITIAL_CAPACITY);
