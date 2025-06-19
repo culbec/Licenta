@@ -3,6 +3,7 @@
 *.dll
 *.so
 *.o
+*.out
 
 # configs
 .vscode
