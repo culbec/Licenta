@@ -126,8 +126,8 @@ if [ ! -d $D ]; then
 fi
 
 # fisiere cu encoding ASCII
-find $D -type f | while read $F; do
-    if file $F | grep -q "\< ASCII\>"; then
+find $D -type f | while read F; do
+    if file $F | grep -q "ASCII"; then
         echo $f
     fi
 done
