@@ -145,37 +145,37 @@ public:
     }
 };
 
-std::vector<std::string> mergeAlphabeticSortedStringListsHelper(const std::vector<std::string> &L1, size_t indexL1, const std::vector<std::string> &L2, size_t indexL2)
+std::vector<std::string> mergeAlphabeticSortedStringListsHelper(const std::vector<std::string> &L1, int indexL1, const std::vector<std::string> &L2, int indexL2)
 {
-    if (indexL1 >= L1.size() && indexL2 >= L2.size())
+    if (indexL1 < 0 && indexL2 < 0)
     {
         return std::vector<std::string>{};
     }
-    else if (indexL1 < L1.size() && indexL2 >= L2.size())
+    else if (indexL1 >= 0 && indexL2 < 0)
     {
-        auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1 + 1, L2, indexL2);
+        auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1 - 1, L2, indexL2);
         result.push_back(L1.at(indexL1));
         return result;
     }
-    else if (indexL1 >= L1.size() && indexL2 < L2.size())
+    else if (indexL1 < 0 && indexL2 >= 0)
     {
-        auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1, L2, indexL2 + 1);
+        auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1, L2, indexL2 - 1);
         result.push_back(L2.at(indexL2));
         return result;
     }
 
-    // merging from the beginning of the lists to the end, recursively
+    // merging from the end of the lists to the beginning, recursively
     if (L1.at(indexL1) < L2.at(indexL2))
     {
-        // addding L1[i]
-        auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1 + 1, L2, indexL2);
-        result.push_back(L1.at(indexL1));
+        // adding L2[i]
+        auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1, L2, indexL2 - 1);
+        result.push_back(L2.at(indexL2));
         return result;
     }
 
-    // adding L2[i]
-    auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1, L2, indexL2 + 1);
-    result.push_back(L2.at(indexL2));
+    // adding L1[i]
+    auto result = mergeAlphabeticSortedStringListsHelper(L1, indexL1 - 1, L2, indexL2);
+    result.push_back(L1.at(indexL1));
     return result;
 }
 
@@ -189,7 +189,7 @@ std::vector<std::string> mergeAlphabeticSortedStringListsHelper(const std::vecto
  */
 std::vector<std::string> mergeAlphabeticSortedStringLists(const std::vector<std::string> &L1, const std::vector<std::string> &L2)
 {
-    return mergeAlphabeticSortedStringListsHelper(L1, 0, L2, 0);
+    return mergeAlphabeticSortedStringListsHelper(L1, L1.size() - 1, L2, L2.size() - 1);
 }
 
 //* c)

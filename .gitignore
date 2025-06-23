@@ -7,3 +7,6 @@
 
 # configs
 .vscode
+.idea
+*bin*
+*obj*
