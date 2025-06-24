@@ -110,7 +110,7 @@ CodSofer        Nr
 1               2
 
 -- b2) 
--- {CodCursa} -> {CodAuto}. CodCursa=1 sau CodCursa=3 are CodAuto=1, deci nu e adevarat
+-- {CodCursa} -> {CodAuto}. Avem CodCursa unice => ok!
 -- {CodAuto} -> {LocPlecare}. CodAuto=1 are LocPlecare=LP1 sau LocPlecare=LP4, deci nu e adevarat
 
 DROP DATABASE Main;
