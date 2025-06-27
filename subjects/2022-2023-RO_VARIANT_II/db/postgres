@@ -1,0 +1,157 @@
+-- Problema 1
+-- DROP TABLE IF EXISTS FirmeBiciclete CASCADE;
+-- DROP TABLE IF EXISTS Biciclete CASCADE;
+-- DROP TABLE IF EXISTS Clienti CASCADE;
+-- DROP TABLE IF EXISTS FiseInchiriere CASCADE;
+-- DROP TABLE IF EXISTS InchirieriBiciclete CASCADE;
+
+-- CREATE TABLE FirmeBiciclete(
+-- 	CodFB SERIAL PRIMARY KEY,
+-- 	Nume TEXT NOT NULL,
+-- 	Tara TEXT NOT NULL
+-- );
+
+-- CREATE TABLE Biciclete(
+-- 	CodB SERIAL PRIMARY KEY,
+-- 	Model TEXT NOT NULL,
+-- 	Marime INTEGER CHECK(Marime > 30),
+-- 	PretInchiriere FLOAT CHECK(PretInchiriere > 0.0),
+-- 	FK_FirmaBiciclete INTEGER REFERENCES FirmaBiciclete(CodFB)
+-- 		ON DELETE CASCADE
+-- 		ON UPDATE CASCADE
+-- );
+
+-- CREATE TABLE Clienti (
+-- 	CNP SERIAL PRIMARY KEY,
+-- 	Nume TEXT NOT NULL,
+-- 	Telefon TEXT NOT NULL UNIQUE CHECK (length(Telefon) = 10), -- cheie candidat
+-- 	Email TEXT NOT NULL UNIQUE -- cheie candidat
+-- );
+
+-- CREATE TABLE FiseInchiriere(
+-- 	CodFI SERIAL PRIMARY KEY,
+-- 	DataIntocmire TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- 	FK_CNPClient INTEGER REFERENCES Clienti(CNP)
+-- 		ON DELETE CASCADE
+-- 		ON UPDATE CASCADE,
+-- 	CONSTRAINT UNIQUE_ClientDataIntocmire UNIQUE(FK_CNPClient, DataIntocmire)
+-- );
+
+-- CREATE TABLE InchirieriBiciclete(
+-- 	FK_FisaInchiriere INTEGER REFERENCES FiseInchiriere(CodFI)
+-- 		ON DELETE CASCADE
+-- 		ON UPDATE CASCADE,
+-- 	FK_Bicicleta INTEGER REFERENCES Biciclete(CodB)
+-- 		ON DELETE CASCADE
+-- 		ON UPDATE CASCADE,
+-- 	DataInceputPerioadaInchiriere TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- 	DataSfarsitPerioadaInchiriere TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- 	CONSTRAINT CHECK_PerioadaInchiriere CHECK(DataInceputPerioadaInchiriere < DataSfarsitPerioadaInchiriere),
+-- 	CONSTRAINT PK_FisaInchiriere_Bicicleta PRIMARY KEY(FK_FisaInchiriere, FK_Bicicleta)
+-- );
+
+-- DROP TABLE IF EXISTS FirmeBiciclete CASCADE;
+-- DROP TABLE IF EXISTS Biciclete CASCADE;
+-- DROP TABLE IF EXISTS Clienti CASCADE;
+-- DROP TABLE IF EXISTS FiseInchiriere CASCADE;
+-- DROP TABLE IF EXISTS InchirieriBiciclete CASCADE;
+
+-- Problema 2
+DROP TABLE IF EXISTS Clienti CASCADE;
+DROP TABLE IF EXISTS Soferi CASCADE;
+DROP TABLE IF EXISTS Autoturisme CASCADE;
+DROP TABLE IF EXISTS Curse CASCADE;
+
+CREATE TABLE Clienti(
+	CodClient SERIAL PRIMARY KEY,
+	NumeClient TEXT NOT NULL,
+	Telefon TEXT NOT NULL
+);
+
+CREATE TABLE Soferi(
+	CodSofer SERIAL PRIMARY KEY,
+	NumeSofer TEXT NOT NULL,
+	Salariu FLOAT NOT NULL
+);
+
+CREATE TABLE Autoturisme(
+	CodAuto SERIAL PRIMARY KEY,
+	NumarInmatriculare TEXT NOT NULL,
+	MarcaAuto TEXT NOT NULL,
+	CodSofer INTEGER REFERENCES Soferi(CodSofer)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE Curse(
+	CodCursa SERIAL PRIMARY KEY,
+	CodClient INTEGER REFERENCES Clienti(CodClient)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CodAuto INTEGER REFERENCES Autoturisme(CodAuto)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	DataCursa DATE NOT NULL,
+	MomentPlecare TEXT NOT NULL,
+	DurataCursa INTEGER NOT NULL,
+	LocPlecare TEXT NOT NULL,
+	Destinatie TEXT NOT NULL,
+	SumaDePlata FLOAT NOT NULL
+);
+
+-- Insert clients
+INSERT INTO Clienti (NumeClient, Telefon) VALUES
+('Alice Popescu', '0712345678'),
+('Bogdan Ionescu', '0723456789');
+
+-- Insert drivers
+INSERT INTO Soferi (NumeSofer, Salariu) VALUES
+('Andrei Vasilescu', 4000),  -- This one drives Ford to Iulius Mall Cluj
+('Cristian Radu', 4500),     -- Also drives Ford to Iulius Mall Cluj (highest salary)
+('Daniela Ilie', 3000),      -- Drives Ford elsewhere
+('Elena Georgescu', 5000);   -- Drives BMW to Iulius Mall Cluj, should not be included
+
+-- Insert cars
+INSERT INTO Autoturisme (NumarInmatriculare, MarcaAuto, CodSofer) VALUES
+('CJ01AAA', 'Ford', 1),  -- Andrei
+('CJ02BBB', 'Ford', 2),  -- Cristian
+('CJ03CCC', 'Ford', 3),  -- Daniela
+('CJ04DDD', 'BMW', 4);   -- Elena
+
+-- Insert trips
+INSERT INTO Curse (CodClient, CodAuto, DataCursa, MomentPlecare, DurataCursa, LocPlecare, Destinatie, SumaDePlata) VALUES
+-- Andrei Vasilescu (Ford to Iulius Mall Cluj)
+(1, 1, '2024-05-01', '08:00', 30, 'Centru', 'Iulius Mall Cluj', 50.0),
+-- Cristian Radu (Ford to Iulius Mall Cluj)
+(2, 2, '2024-05-02', '09:00', 25, 'Gara', 'Iulius Mall Cluj', 45.0),
+-- Daniela Ilie (Ford elsewhere)
+(1, 3, '2024-05-03', '10:00', 20, 'Centru', 'Aeroport', 40.0),
+-- Elena Georgescu (BMW to Iulius Mall Cluj)
+(2, 4, '2024-05-04', '11:00', 35, 'Centru', 'Iulius Mall Cluj', 60.0);
+
+-- a) SQL Query care returneaza codul, numele si salariul soferilor care au cel mai mare salariu dintre toti
+-- soferii care au avut cel putin o cursa cu destinatia 'Iulius Mall Cluj' cu un autoturism marca 'Ford'
+-- Eliminati duplicatele
+SELECT DISTINCT S.CodSofer, S.NumeSofer, S.Salariu
+FROM Soferi S
+INNER JOIN Autoturisme A ON S.CodSofer = A.CodSofer
+INNER JOIN Curse C ON A.CodAuto = C.CodAuto
+WHERE S.CodSofer IN (
+		SELECT S1.CodSofer
+		FROM Soferi S1
+		INNER JOIN Autoturisme A1 ON S1.CodSofer = A1.CodSofer
+		INNER JOIN Curse C1 ON A1.CodAuto = C1.CodAuto
+		WHERE A1.MarcaAuto = 'Ford' AND C1.Destinatie = 'Iulius Mall Cluj'
+	)
+	AND S.Salariu = (
+		SELECT MAX(S2.Salariu)
+		From Soferi S2
+		INNER JOIN Autoturisme A2 ON S2.CodSofer = A2.CodSofer
+		INNER JOIN Curse C2 ON A2.CodAuto = C2.CodAuto
+		WHERE A2.MarcaAuto = 'Ford' AND C2.Destinatie = 'Iulius Mall Cluj'
+	);
+
+-- DROP TABLE IF EXISTS Clienti CASCADE;
+-- DROP TABLE IF EXISTS Soferi CASCADE;
+-- DROP TABLE IF EXISTS Autoturisme CASCADE;
+-- DROP TABLE IF EXISTS Curse CASCADE;
