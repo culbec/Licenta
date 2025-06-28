@@ -1,9 +1,10 @@
+#include <algorithm>
 #include <iostream>
+#include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <utility>
-#include <algorithm>
-#include <sstream>
 
 #define DEFAULT_VEHICLE_BASEPRICE 100
 #define DEFAULT_CAR_MODEL "Ferrari"
@@ -94,19 +95,27 @@ std::vector<std::pair<std::string, size_t>> modelWithNumberOfCars(const std::vec
 
     for (const auto &vehicle : vehicles)
     {
-        std::stringstream ss(vehicle->description());
-        std::vector<std::string> tokens;
-        std::string token;
-        while (getline(ss, token, ' '))
-        {
-            tokens.push_back(token);
-        }
+        // ALTERNATIVE with STRINGSTREAM DELIMITER SPLIT
+        // std::stringstream ss(vehicle->description());
+        // std::vector<std::string> tokens;
+        // std::string token;
+        // while (getline(ss, token, ' '))
+        // {
+        //     tokens.push_back(token);
+        // }
 
-        std::string model = vehicle->description();
-        if (!tokens.empty())
+        // std::string model = vehicle->description();
+        // if (!tokens.empty())
+        // {
+        //     model = tokens.back();
+        // }
+        const Car *car = dynamic_cast<const Car *>(vehicle);
+        if (!car)
         {
-            model = tokens.back();
+            // not a vehicle with model
+            continue;
         }
+        auto model = car->Car::description();
 
         auto iter = std::find_if(result.begin(), result.end(), [&model](const std::pair<std::string, size_t> &pair)
                                  { return pair.first == model; });
