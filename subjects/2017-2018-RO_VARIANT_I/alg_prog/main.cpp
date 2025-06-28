@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <utility>
 
 #define DEFAULT_VEHICLE_BASEPRICE 100
@@ -88,6 +89,24 @@ public:
         return "Car with parking sensor " + sensorType + " " + Car::description();
     }
 };
+
+std::vector<std::pair<std::string, size_t>> modelWithNumberOfCarsMap(const std::vector<Vehicle*> &vehicles) {
+    std::unordered_map<std::string, size_t> modelNumberOfCarsMapping;
+
+    for (const auto& v: vehicles) {
+        const Car* car = dynamic_cast<const Car*>(v);
+
+        if (!car) {
+            // vehicle without model
+            continue;
+        }
+
+        auto model = car->Car::description();
+        modelNumberOfCarsMapping[model]++;
+    }
+
+    return std::vector<std::pair<std::string, size_t>>(modelNumberOfCarsMapping.begin(), modelNumberOfCarsMapping.end());
+}
 
 std::vector<std::pair<std::string, size_t>> modelWithNumberOfCars(const std::vector<Vehicle *> &vehicles)
 {
@@ -174,6 +193,11 @@ int main()
     auto pairs = modelWithNumberOfCars(vehicles);
     for (const auto &pair : pairs)
     {
+        std::cout << pair.first << ":" << pair.second << "\n";
+    }
+
+    auto pairsMap = modelWithNumberOfCarsMap(vehicles);
+    for (const auto& pair: pairsMap) {
         std::cout << pair.first << ":" << pair.second << "\n";
     }
 
