@@ -41,6 +41,20 @@ def isInorderTraversal(a: list) -> int | list:
     return 0 if len(mapping) == 0 else [(k, v) for k, v in mapping.items()]
 
 
+def isInorderTraversalCycleSort(a: list) -> int | list:
+    swaps = []
+    a_copy = a.copy()
+    
+    for i in range(len(a)):
+        while a_copy[i] != (i + 1):
+            current = a_copy[i]
+            
+            swaps.append(tuple(sorted((a_copy[i], a_copy[current - 1]))))
+            a_copy[i], a_copy[current - 1] = a_copy[current - 1], a_copy[i]
+    
+    return 0 if len(swaps) == 0 else list(swaps)
+
+
 if __name__ == "__main__":
     l = [14, 12, 9, 5]
     start, end = 0, len(l)
@@ -54,3 +68,6 @@ if __name__ == "__main__":
 
     a = [3, 2, 1]
     print(isInorderTraversal(a))
+    print(isInorderTraversal([5, 2, 4, 1, 3]))
+    print(isInorderTraversalCycleSort(a))
+    print(isInorderTraversalCycleSort([5, 2, 4, 1, 3]))
